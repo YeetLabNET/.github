@@ -136,3 +136,8 @@ labels:
   - name: migration
     color: '#2f81f7'
     description: 'This PR involves a migration'
+
+branches:
+  - name: main
+
+  - name: develop
