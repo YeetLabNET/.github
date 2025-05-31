@@ -1,0 +1,77 @@
+{{- $data := (ds "config") -}}
+{{- $is_terraform := (strings.Contains "terraform-" ((ds "config").github_repo))  -}}
+
+{{/* Inspired https://github.com/Dirrk/action-docs/blob/master/src/default_template.tpl */}}
+{{- define "escape_chars" }}{{ . | strings.ReplaceAll "_" "\\_" | strings.ReplaceAll "|" "\\|" | strings.ReplaceAll "*" "\\*" }}{{- end }}
+{{- define "sanatize_string" }}{{ . | strings.ReplaceAll "\n\n" "<br><br>" | strings.ReplaceAll "  \n" "<br>" | strings.ReplaceAll "\n" "<br>" | tmpl.Exec "escape_chars" }}{{- end }}
+
+# {{(ds "config").name}}
+
+{{- if has (ds "config") "description" }}
+{{ (ds "config").description }}
+{{- end }}
+
+{{ if has (ds "config") "screenshots" }}
+## Screenshots
+
+{{ range $screenshot := (ds "config").screenshots }}
+{{- if or ( $screenshot.url | regexp.Match "\\.mp4$") ($screenshot.url | regexp.Match "\\.mp4\\?.*") -}}
+<video src="{{ $screenshot.url }}" ></video>
+{{- else -}}
+<img src="{{ $screenshot.url }}" alt="{{ $screenshot.name }}" />
+{{- end -}}
+*{{ $screenshot.description }}*
+{{ end }}
+{{- end }}
+
+{{ if has (ds "config") "introduction" }}
+## Introduction
+
+{{ (ds "config").introduction }}
+{{ end }}
+
+{{ if has (ds "config") "usage" }}
+## Usage
+
+{{ (ds "config").usage -}}
+{{ end }}
+
+{{ if has (ds "config") "quickstart" -}}
+## Quick Start
+
+{{ (ds "config").quickstart -}}
+{{ end }}
+
+{{- if has (ds "config") "examples" }}
+## Examples
+
+{{ (ds "config").examples }}
+{{ end }}
+
+{{ if has (ds "config") "terraform_docs" }}
+<!-- markdownlint-disable -->
+{{ (ds "config").terraform_docs }}
+<!-- markdownlint-restore -->
+{{ end }}
+
+{{ if has (ds "config") "include" }}
+{{ range $file := (datasource "config").include -}}
+{{ (include "includes" $file) }}
+{{- end }}
+{{- end }}
+
+{{ if has (ds "config") "related" }}
+## Related Projects
+
+Check out these related projects.
+{{ range $related := (ds "config").related }}
+{{ printf "- [%s](%s) - %s" $related.name $related.url $related.description }}{{ end }}
+{{- end }}
+
+{{ if has (ds "config") "references" }}
+## References
+
+For additional context, refer to some of these links.
+{{ range $reference := (ds "config").references }}
+{{ printf "- [%s](%s) - %s" $reference.name $reference.url $reference.description }}{{ end }}
+{{ end }}
